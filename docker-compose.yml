@@ -1,0 +1,41 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/azure-sql-edge:1.0.7
+    volumes:
+      - mssql_data:/var/opt/mssql
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: yourStrong(!)Password
+    healthcheck:
+      test: [ "CMD-SHELL", "cat /var/opt/mssql/log/errorlog | grep -q 'SQL Server is now ready for client connections.'" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-backend:v18
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      ConnectionStrings__MultipleChoiceToolDb: 'Server=mssql;Database=MultipleChoiceTool;User Id=sa;Password=yourStrong(!)Password;TrustServerCertificate=True'
+    depends_on:
+      mssql:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-frontend:v6
+    ports:
+      - 8090:80
+      - 8091:443
+    environment:
+      VITE_BACKEND_API_URL: http://localhost:8080
+    depends_on:
+      mssql:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  mssql_data:
