@@ -14,7 +14,7 @@ services:
       retries: 3
 
   backend:
-    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-backend:v18
+    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-backend:v21
     ports:
       - 8080:8080
       - 8081:8081
@@ -26,7 +26,7 @@ services:
     restart: on-failure
 
   frontend:
-    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-frontend:v8
+    image: ghcr.io/osp-gruppe2-multiplechoicetool/mct-frontend:v10
     ports:
       - 8090:80
       - 8091:443
